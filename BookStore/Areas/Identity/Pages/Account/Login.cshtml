@@ -1,0 +1,237 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<style>
+    .login-wrapper {
+        min-height: calc(100vh - 140px);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 2rem 1rem 3rem;
+    }
+
+    .login-card {
+        background: var(--surface-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 450px;
+        animation: fadeUp 0.4s ease;
+    }
+
+        .login-card h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.1rem;
+        }
+
+        .login-card h2 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+    .divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 1.25rem 0;
+    }
+
+    .form-floating > .form-control {
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm) !important;
+        background: var(--surface);
+        font-family: 'DM Sans', sans-serif;
+        transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+        .form-floating > .form-control:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(200,150,62,0.15) !important;
+            background: #fff;
+        }
+
+    .form-floating > label {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+    }
+
+    /* Password wrapper with eye icon */
+    .pw-wrapper {
+        position: relative;
+    }
+
+        .pw-wrapper .form-control {
+            padding-right: 3rem !important;
+        }
+
+    .pw-toggle {
+        position: absolute;
+        right: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        z-index: 5;
+        transition: color 0.2s;
+    }
+
+        .pw-toggle:hover {
+            color: var(--accent);
+        }
+
+    .field-error {
+        color: #e74c3c;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 1rem;
+        font-weight: 700;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.25s;
+        font-family: 'Playfair Display', serif;
+        margin-top: 0.5rem;
+    }
+
+        .btn-login:hover {
+            background: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(200,150,62,0.35);
+        }
+
+    .register-link {
+        text-align: center;
+        margin-top: 1.25rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+        .register-link a {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .register-link a:hover {
+                text-decoration: underline;
+            }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+        .checkbox-label input {
+            width: 1rem;
+            height: 1rem;
+            accent-color: var(--accent);
+        }
+
+    /* منع ظهور عين المتصفح الافتراضية */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-webkit-contacts-auto-fill-button,
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+        display: none !important;
+    }
+
+    input[type="password"] {
+        -webkit-text-security: disc;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h1>Welcome Back</h1>
+        <h2>Log in to your account</h2>
+
+        <div asp-validation-summary="ModelOnly" class="field-error mb-3" role="alert"></div>
+
+        <form id="account" method="post">
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="field-error"></span>
+            </div>
+
+            <!-- Password with eye icon -->
+            <div class="form-floating mb-3 pw-wrapper">
+                <input asp-for="Input.Password" id="passwordInput" type="password"
+                       class="form-control" autocomplete="current-password"
+                       aria-required="true" placeholder="Password" />
+                <label asp-for="Input.Password">Password</label>
+                <button type="button" class="pw-toggle" id="togglePassword">
+                    <i class="fa-solid fa-eye" id="passwordIcon"></i>
+                </button>
+                <span asp-validation-for="Input.Password" class="field-error"></span>
+            </div>
+
+            <div class="checkbox-label">
+                <input asp-for="Input.RememberMe" />
+                <label asp-for="Input.RememberMe">Remember me</label>
+            </div>
+
+            <button id="login-submit" type="submit" class="btn-login">
+                Log in →
+            </button>
+        </form>
+
+        <div class="register-link">
+            Don't have an account? <a asp-page="./Register">Create one</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Toggle for Password field (العين)
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('passwordInput');
+        const passwordIcon = document.getElementById('passwordIcon');
+
+        if (togglePassword && password) {
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                if (passwordIcon) {
+                    if (type === 'password') {
+                        passwordIcon.className = 'fa-solid fa-eye';
+                    } else {
+                        passwordIcon.className = 'fa-solid fa-eye-slash';
+                    }
+                }
+            });
+        }
+    </script>
+}

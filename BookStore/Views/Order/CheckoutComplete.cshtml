@@ -1,0 +1,37 @@
+@model BookStore.Models.Order
+
+@{
+    ViewData["Title"] = "Order Complete";
+}
+
+<div class="checkout-card text-center">
+    <div style="font-size:4rem; margin-bottom:1rem; animation: fadeUp 0.5s ease;">🎉</div>
+    <h2 style="color:var(--accent);">Order Placed Successfully!</h2>
+    <p class="text-muted">Thank you for your purchase. Your books are on their way!</p>
+
+    <div class="mt-3 mb-3 text-start" style="background:var(--surface); border-radius:var(--radius-sm); padding:1rem; border:1px solid var(--border);">
+        <p class="mb-1"><strong>Order #@Model.Id</strong></p>
+        <p class="mb-1 text-muted small">Placed on: @Model.OrderPlaced.ToString("MMMM dd, yyyy - hh:mm tt")</p>
+        @if (!string.IsNullOrEmpty(Model.UserEmail))
+        {
+            <p class="mb-1 text-muted small"><i class="fa-solid fa-envelope me-1"></i>@Model.UserEmail</p>
+        }
+        <hr style="border-color:var(--border);" />
+        @foreach (var item in Model.OrderItems)
+        {
+            <div class="d-flex justify-content-between small mb-1">
+                <span>@item.Book?.Title × @item.Quantity</span>
+                <span style="color:var(--accent);">$@item.Price</span>
+            </div>
+        }
+        <hr style="border-color:var(--border);" />
+        <div class="d-flex justify-content-between fw-bold">
+            <span>Total</span>
+            <span style="color:var(--accent); font-size:1.1rem;">$@Model.OrderTotal</span>
+        </div>
+    </div>
+
+    <a asp-controller="Store" asp-action="Index" class="btn btn-primary mt-2">
+        <i class="fa-solid fa-book me-1"></i>Continue Shopping
+    </a>
+</div>

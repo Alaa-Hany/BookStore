@@ -1,0 +1,22 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+
+# ASP.NET temporary files
+*.cache
+*.dbmdl
+
+# Others
+*.log
+*.pdb
+.vs/
+bin/
+obj/
+.vs/
+bin/
+obj/

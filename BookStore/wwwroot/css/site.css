@@ -1,0 +1,22 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Override Bootstrap focus to match our theme */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(200,150,62,0.2);
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+/* REMOVED: body { margin-bottom: 60px; } -- was causing footer to overlap content */
+/* Footer is handled via flexbox in myCss.css (min-vh-100 + flex-column + mt-auto) */

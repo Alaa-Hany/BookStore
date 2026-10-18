@@ -1,0 +1,306 @@
+﻿@model IEnumerable<BookStore.Models.Order>
+
+@{
+    ViewData["Title"] = "Orders Management";
+}
+
+<div class="page-header">
+    <h1><i class="fa-solid fa-list me-2" style="color:var(--accent)"></i>Orders Management</h1>
+    <span class="ms-auto text-muted small">@Model.Count() order(s)</span>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <i class="fa-solid fa-box-open"></i>
+        <h3>No orders yet</h3>
+        <p class="text-muted">Orders will appear here once customers start purchasing.</p>
+    </div>
+}
+else
+{
+    <div class="orders-stats mb-4 d-flex gap-3 flex-wrap">
+        <div class="stat-badge">
+            <i class="fa-solid fa-clock-rotate-left me-1"></i>
+            Pending: <strong>@Model.Count(o => !o.IsShipped && !o.IsDelivered)</strong>
+        </div>
+        <div class="stat-badge shipped">
+            <i class="fa-solid fa-truck-fast me-1"></i>
+            Shipped: <strong>@Model.Count(o => o.IsShipped && !o.IsDelivered)</strong>
+        </div>
+        <div class="stat-badge delivered">
+            <i class="fa-solid fa-circle-check me-1"></i>
+            Delivered: <strong>@Model.Count(o => o.IsDelivered)</strong>
+        </div>
+        <div class="stat-badge total">
+            <i class="fa-solid fa-dollar-sign me-1"></i>
+            Total Revenue: <strong>@Model.Sum(o => o.OrderTotal).ToString("C")</strong>
+        </div>
+    </div>
+
+    <div class="orders-list">
+        @foreach (var order in Model)
+        {
+            <div class="order-card @(order.IsDelivered ? "delivered" : (order.IsShipped ? "shipped" : "pending"))">
+                <div class="order-card-header">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <span class="order-id"># @order.Id</span>
+                        <span class="order-date">
+                            <i class="fa-regular fa-calendar me-1"></i>
+                            @order.OrderPlaced.ToString("MMM dd, yyyy - hh:mm tt")
+                        </span>
+                        @if (order.IsDelivered)
+                        {
+                            <span class="badge-status delivered">
+                                <i class="fa-solid fa-circle-check me-1"></i>Delivered
+                                @if (order.DeliveredDate.HasValue)
+                                {
+                                    <small>on @order.DeliveredDate.Value.ToString("MMM dd, yyyy")</small>
+                                }
+                            </span>
+                        }
+                        else if (order.IsShipped)
+                        {
+                            <span class="badge-status shipped">
+                                <i class="fa-solid fa-truck-fast me-1"></i>Shipped
+                                @if (order.ShippedDate.HasValue)
+                                {
+                                    <small>on @order.ShippedDate.Value.ToString("MMM dd, yyyy")</small>
+                                }
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-status pending">
+                                <i class="fa-solid fa-clock me-1"></i>Pending
+                            </span>
+                        }
+                    </div>
+                    <div class="order-total">@order.OrderTotal.ToString("C")</div>
+                </div>
+
+                <div class="order-card-body">
+                    <!-- Customer Info -->
+                    <div class="customer-info">
+                        <h6><i class="fa-solid fa-user me-2" style="color:var(--accent)"></i>Customer</h6>
+                        <p class="mb-1">
+                            <i class="fa-solid fa-envelope me-1 text-muted"></i>
+                            @(string.IsNullOrEmpty(order.UserEmail) ? "Unknown" : order.UserEmail)
+                        </p>
+                        @if (!string.IsNullOrEmpty(order.UserFullName) && order.UserFullName.Trim() != "")
+                        {
+                            <p class="mb-0 text-muted small">@order.UserFullName</p>
+                        }
+                    </div>
+
+                    <!-- Books -->
+                    <div class="order-items">
+                        <h6><i class="fa-solid fa-book me-2" style="color:var(--accent)"></i>Books Ordered</h6>
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Book</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in order.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@item.Book?.Title</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.Price.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="order-card-footer">
+                    @if (!order.IsShipped && !order.IsDelivered)
+                    {
+                        <form asp-action="MarkAsShipped" asp-route-id="@order.Id" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-truck me-1"></i>Mark as Shipped
+                            </button>
+                        </form>
+                    }
+                    @if (order.IsShipped && !order.IsDelivered)
+                    {
+                        <span class="badge bg-info text-white">
+                            <i class="fa-solid fa-truck-fast me-1"></i>Waiting for customer confirmation
+                        </span>
+                    }
+                    @if (order.IsDelivered)
+                    {
+                        <form asp-action="RevertToPending" asp-route-id="@order.Id" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                <i class="fa-solid fa-rotate-left me-1"></i>Revert to Pending
+                            </button>
+                        </form>
+                        <span class="badge bg-success ms-2">
+                            <i class="fa-solid fa-circle-check me-1"></i>Delivered on @order.DeliveredDate?.ToString("MMM dd")
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .orders-stats {
+    }
+
+    .stat-badge {
+        background: var(--surface-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        box-shadow: var(--shadow-sm);
+    }
+
+        .stat-badge.shipped {
+            border-color: #17a2b8;
+            color: #17a2b8;
+        }
+
+        .stat-badge.delivered {
+            border-color: #2d7a4f;
+            color: #2d7a4f;
+        }
+
+        .stat-badge.total {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+    .order-card {
+        background: var(--surface-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 1.25rem;
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+        animation: fadeUp 0.4s ease both;
+    }
+
+        .order-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .order-card.delivered {
+            border-left: 4px solid #2d7a4f;
+        }
+
+        .order-card.shipped {
+            border-left: 4px solid #17a2b8;
+        }
+
+        .order-card.pending {
+            border-left: 4px solid var(--accent);
+        }
+
+    .order-card-header {
+        background: var(--primary);
+        color: #fff;
+        padding: 0.85rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .order-id {
+        font-weight: 700;
+        font-size: 1.05rem;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .order-date {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.7);
+    }
+
+    .order-total {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--accent);
+        font-family: 'Playfair Display', serif;
+    }
+
+    .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+        .badge-status.delivered {
+            background: rgba(45,122,79,0.2);
+            color: #5dbe8a;
+        }
+
+        .badge-status.shipped {
+            background: rgba(23,162,184,0.2);
+            color: #5dd0e0;
+        }
+
+        .badge-status.pending {
+            background: rgba(200,150,62,0.2);
+            color: var(--accent-light);
+        }
+
+    .order-card-body {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 1.5rem;
+        padding: 1.25rem;
+    }
+
+    @@media (max-width: 768px) {
+        .order-card-body {
+            grid-template-columns: 1fr;
+        }
+
+        .order-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .order-total {
+            width: 100%;
+            text-align: left;
+        }
+    }
+
+    .customer-info h6, .order-items h6 {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+
+    .customer-info p {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .order-card-footer {
+        padding: 0.75rem 1.25rem;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 0.5rem;
+    }

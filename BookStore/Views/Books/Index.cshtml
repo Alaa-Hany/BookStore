@@ -1,0 +1,67 @@
+@model IEnumerable<BookStore.Models.Book>
+
+@{
+    ViewData["Title"] = "Books Management";
+}
+
+<div class="page-header">
+    <h1><i class="fa-solid fa-book me-2" style="color:var(--accent)"></i>Books Management</h1>
+    <a asp-action="Create" class="btn btn-primary ms-auto">
+        <i class="fa-solid fa-plus me-1"></i>Add Book
+    </a>
+</div>
+
+@{
+    string HasImage(BookStore.Models.Book book)
+    {
+        return (!string.IsNullOrEmpty(book.ImageUrl)) ? "fa-solid fa-check" : "fa-solid fa-xmark";
+    }
+    string HasImageColor(BookStore.Models.Book book)
+    {
+        return (!string.IsNullOrEmpty(book.ImageUrl)) ? "#2d7a4f" : "#e74c3c";
+    }
+}
+
+<div class="book-details-card p-0" style="overflow:hidden;">
+    <table class="table mb-0">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Language</th>
+                <th>ISBN</th>
+                <th>Published</th>
+                <th>Price</th>
+                <th>Image</th>
+                <th style="width:130px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.Title</strong></td>
+                    <td>@item.Author</td>
+                    <td>@item.Language</td>
+                    <td><small class="text-muted">@item.ISBN</small></td>
+                    <td><small>@item.DatePublished.ToString("yyyy")</small></td>
+                    <td style="color:var(--accent); font-weight:700;">$@item.Price</td>
+                    <td>
+                        <i class="@HasImage(item)" style="color:@HasImageColor(item);"></i>
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm" title="Edit">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-success btn-sm" title="Details">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Delete">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,108 @@
+@model BookStore.Models.Book
+
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<div class="page-header">
+    <a asp-action="Index" class="btn btn-warning me-3">
+        <i class="fa-solid fa-arrow-left me-1"></i>Back
+    </a>
+    <h1><i class="fa-solid fa-pen-to-square me-2" style="color:var(--accent)"></i>Edit Book</h1>
+</div>
+
+<div class="book-details-card" style="max-width:680px; margin:0 auto;">
+    <form asp-action="Edit" id="editBookForm">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" style="border-radius:var(--radius-sm);"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Author" class="form-label fw-semibold">Author <span class="text-danger">*</span></label>
+                <input asp-for="Author" class="form-control" />
+                <span asp-validation-for="Author" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Language" class="form-label fw-semibold">Language</label>
+                <input asp-for="Language" class="form-control" />
+                <span asp-validation-for="Language" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ISBN" class="form-label fw-semibold">ISBN</label>
+                <input asp-for="ISBN" class="form-control" />
+                <span asp-validation-for="ISBN" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="DatePublished" class="form-label fw-semibold">Date Published</label>
+                <input asp-for="DatePublished" class="form-control" type="date" />
+                <span asp-validation-for="DatePublished" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Price" class="form-label fw-semibold">Price ($) <span class="text-danger">*</span></label>
+                <input asp-for="Price" class="form-control" type="number" min="0" />
+                <span asp-validation-for="Price" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="ImageUrl" class="form-label fw-semibold">Image URL</label>
+                <input asp-for="ImageUrl" class="form-control" id="imageUrlInput" />
+                <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div id="imagePreview" class="mt-2">
+                        <img id="previewImg" src="@Model.ImageUrl" alt="Current cover"
+                             style="max-height:160px; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);" />
+                    </div>
+                }
+                else
+                {
+                    <div id="imagePreview" class="mt-2" style="display:none;">
+                        <img id="previewImg" src="" alt="Preview"
+                             style="max-height:160px; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);" />
+                    </div>
+                }
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2 mt-2">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const imgInput = document.getElementById('imageUrlInput');
+        const imgPreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        if (imgInput) {
+            imgInput.addEventListener('input', function () {
+                const url = this.value.trim();
+                if (url.length > 10) {
+                    previewImg.src = url;
+                    imgPreview.style.display = 'block';
+                    previewImg.onerror = function () { imgPreview.style.display = 'none'; };
+                } else {
+                    imgPreview.style.display = 'none';
+                }
+            });
+        }
+    </script>
+}

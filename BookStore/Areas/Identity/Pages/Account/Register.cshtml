@@ -1,0 +1,354 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<style>
+    .register-wrapper {
+        min-height: calc(100vh - 140px);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 2rem 1rem 3rem;
+    }
+
+    .register-card {
+        background: var(--surface-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 500px;
+        animation: fadeUp 0.4s ease;
+    }
+
+        .register-card h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.1rem;
+        }
+
+        .register-card h2 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+    .divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 1.25rem 0;
+    }
+
+    .form-floating > .form-control {
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm) !important;
+        background: var(--surface);
+        font-family: 'DM Sans', sans-serif;
+        transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+        .form-floating > .form-control:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(200,150,62,0.15) !important;
+            background: #fff;
+        }
+
+    .form-floating > label {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+    }
+
+    /* PASSWORD */
+    .pw-wrapper {
+        position: relative;
+    }
+
+        .pw-wrapper .form-control {
+            padding-right: 3rem !important;
+        }
+
+    .pw-toggle {
+        position: absolute;
+        right: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        z-index: 5;
+        transition: color 0.2s;
+    }
+
+        .pw-toggle:hover {
+            color: var(--accent);
+        }
+
+    .field-error {
+        color: #e74c3c;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .btn-register {
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 1rem;
+        font-weight: 700;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.25s;
+        font-family: 'Playfair Display', serif;
+        margin-top: 0.5rem;
+    }
+
+        .btn-register:hover {
+            background: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(200,150,62,0.35);
+        }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.25rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+        .login-link a {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .login-link a:hover {
+                text-decoration: underline;
+            }
+
+    .row-2col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 1rem;
+    }
+
+    @@media (max-width: 500px) {
+        .register-card {
+            padding: 1.75rem 1.25rem;
+        }
+
+        .row-2col {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ✅ منع ظهور عين المتصفح الافتراضية */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-webkit-contacts-auto-fill-button,
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+        display: none !important;
+    }
+
+    /* منع عين Edge و Chrome */
+    input[type="password"] {
+        -webkit-text-security: disc;
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <h1>Register</h1>
+        <h2>Create a new account.</h2>
+
+        <div asp-validation-summary="ModelOnly" class="field-error mb-3"></div>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+
+            <div class="row-2col">
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.FirstName" class="form-control" placeholder="First Name" />
+                    <label asp-for="Input.FirstName"></label>
+                    <span asp-validation-for="Input.FirstName" class="field-error"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.LastName" class="form-control" placeholder="Last Name" />
+                    <label asp-for="Input.LastName"></label>
+                    <span asp-validation-for="Input.LastName" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" placeholder="Email" />
+                <label asp-for="Input.Email"></label>
+                <span asp-validation-for="Input.Email" class="field-error"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Address" class="form-control" placeholder="Address" />
+                <label asp-for="Input.Address"></label>
+                <span asp-validation-for="Input.Address" class="field-error"></span>
+            </div>
+
+            <div class="row-2col">
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.ZipCode" class="form-control" placeholder="Zip Code" maxlength="5" inputmode="numeric" />
+                    <label asp-for="Input.ZipCode"></label>
+                    <span asp-validation-for="Input.ZipCode" class="field-error"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.City" class="form-control" placeholder="City" />
+                    <label asp-for="Input.City"></label>
+                    <span asp-validation-for="Input.City" class="field-error"></span>
+                </div>
+            </div>
+
+            <hr class="divider" />
+
+            <!-- Password -->
+            <div class="form-floating mb-3 pw-wrapper">
+                <input asp-for="Input.Password" id="pw1Input" type="password"
+                       class="form-control" placeholder="Password" />
+
+                <label asp-for="Input.Password"></label>
+
+                <button type="button" class="pw-toggle" id="pw1Toggle">
+                    <i class="fa-solid fa-eye" id="pw1Icon"></i>
+                </button>
+
+                <span asp-validation-for="Input.Password" class="field-error"></span>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-floating mb-3 pw-wrapper">
+                <input asp-for="Input.ConfirmPassword"
+                       id="pw2Input"
+                       type="password"
+                       class="form-control"
+                       placeholder="Confirm Password" />
+
+                <label asp-for="Input.ConfirmPassword"></label>
+
+                <button type="button" class="pw-toggle" id="pw2Toggle">
+                    <i class="fa-solid fa-eye" id="pw2Icon"></i>
+                </button>
+
+                <span asp-validation-for="Input.ConfirmPassword" class="field-error"></span>
+            </div>
+
+            <button type="submit" class="btn-register">
+                Create Account →
+            </button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a asp-page="./Login">Sign in</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Validation for First Name - letters only
+        const firstName = document.getElementById('Input_FirstName');
+        if (firstName) {
+            firstName.addEventListener('input', function() {
+                this.value = this.value.replace(/[^a-zA-Z\u0600-\u06FF\s]/g, '');
+            });
+        }
+
+        // Validation for Last Name - letters only
+        const lastName = document.getElementById('Input_LastName');
+        if (lastName) {
+            lastName.addEventListener('input', function() {
+                this.value = this.value.replace(/[^a-zA-Z\u0600-\u06FF\s]/g, '');
+            });
+        }
+
+        // Validation for City - letters only
+        const city = document.getElementById('Input_City');
+        if (city) {
+            city.addEventListener('input', function() {
+                this.value = this.value.replace(/[^a-zA-Z\u0600-\u06FF\s]/g, '');
+            });
+        }
+
+        // Validation for Zip Code - exactly 5 digits only
+        const zipCode = document.getElementById('Input_ZipCode');
+        if (zipCode) {
+            zipCode.addEventListener('input', function() {
+                // Remove non-digits
+                this.value = this.value.replace(/[^0-9]/g, '');
+                // Enforce max 5 digits
+                if (this.value.length > 5) {
+                    this.value = this.value.slice(0, 5);
+                }
+            });
+            zipCode.addEventListener('blur', function() {
+                const span = this.closest('.form-floating').querySelector('.field-error');
+                if (this.value.length > 0 && this.value.length !== 5) {
+                    this.style.borderColor = '#e74c3c';
+                    if (span) span.textContent = 'Zip Code must be exactly 5 digits.';
+                } else {
+                    this.style.borderColor = '';
+                    if (span && span.textContent === 'Zip Code must be exactly 5 digits.') span.textContent = '';
+                }
+            });
+        }
+
+        // Toggle for Password field (العين)
+        const togglePassword = document.getElementById('pw1Toggle');
+        const password = document.getElementById('pw1Input');
+        const passwordIcon = document.getElementById('pw1Icon');
+
+        if (togglePassword && password) {
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                if (passwordIcon) {
+                    if (type === 'password') {
+                        passwordIcon.className = 'fa-solid fa-eye';
+                    } else {
+                        passwordIcon.className = 'fa-solid fa-eye-slash';
+                    }
+                }
+            });
+        }
+
+        // Toggle for Confirm Password field (العين)
+        const toggleConfirmPassword = document.getElementById('pw2Toggle');
+        const confirmPassword = document.getElementById('pw2Input');
+        const confirmPasswordIcon = document.getElementById('pw2Icon');
+
+        if (toggleConfirmPassword && confirmPassword) {
+            toggleConfirmPassword.addEventListener('click', function() {
+                const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPassword.setAttribute('type', type);
+                if (confirmPasswordIcon) {
+                    if (type === 'password') {
+                        confirmPasswordIcon.className = 'fa-solid fa-eye';
+                    } else {
+                        confirmPasswordIcon.className = 'fa-solid fa-eye-slash';
+                    }
+                }
+            });
+        }
+    </script>
+}

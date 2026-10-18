@@ -1,0 +1,47 @@
+@model Order
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fa-solid fa-bag-shopping me-2"></i>Complete Your Order</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fa-solid fa-circle-info me-2"></i>
+                        Your order will be associated with: <strong>@User.Identity?.Name</strong>
+                    </div>
+
+                    <form asp-action="Checkout" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Your Email</label>
+                            <input type="email" class="form-control bg-light" value="@User.Identity?.Name" disabled />
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex gap-2 mt-4">
+                            <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-arrow-left me-1"></i>Back to Cart
+                            </a>
+                            <button type="submit" class="btn btn-success flex-grow-1">
+                                <i class="fa-solid fa-check-circle me-1"></i>Place Order
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

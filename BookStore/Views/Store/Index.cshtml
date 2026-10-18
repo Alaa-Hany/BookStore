@@ -1,0 +1,309 @@
+﻿@model IEnumerable<BookStore.Models.Book>
+@{
+    ViewData["Title"] = "Store";
+}
+
+<style>
+    .toast-notification {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #2d7a4f;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        z-index: 1000;
+        animation: slideInRight 0.3s ease;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+        .toast-notification i {
+            font-size: 1.5rem;
+        }
+
+        .toast-notification .toast-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toast-notification .toast-title {
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .toast-notification .toast-message {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+    @@keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+            visibility: hidden;
+        }
+    }
+
+    .books-container {
+        padding-bottom: 100px;
+    }
+
+    .row.g-3 {
+        margin-bottom: 50px;
+    }
+</style>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["InfoMessage"] != null)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-info me-2"></i> @TempData["InfoMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row g-4 books-container">
+    <div class="col-12 col-md-3">
+        <div class="filter-card">
+            <h5><i class="fa-solid fa-sliders me-2"></i>Filter Books</h5>
+            <form asp-action="Index" method="get">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">Title or Author</label>
+                    <input type="text" name="searchString" placeholder="Search..." class="form-control form-control-sm" value="@Context.Request.Query["searchString"]" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">Price Range</label>
+                    <div class="d-flex gap-2">
+                        <input type="number" name="minPrice" step="1" placeholder="Min $" class="form-control form-control-sm" value="@Context.Request.Query["minPrice"]" />
+                        <input type="number" name="maxPrice" step="1" placeholder="Max $" class="form-control form-control-sm" value="@Context.Request.Query["maxPrice"]" />
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <input type="submit" value="Apply" class="btn btn-primary btn-sm flex-fill" />
+                    <a asp-action="Index" class="btn btn-secondary btn-sm flex-fill">Clear</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-9">
+        <div class="page-header">
+            <h2 class="section-title">Our Books</h2>
+            <span class="ms-auto text-muted small">@Model.Count() books found</span>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <i class="fa-solid fa-book-open"></i>
+                <h3>No Books Found</h3>
+                <p class="text-muted">Try adjusting your filters or <a asp-action="Index">clear all</a>.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var book in Model)
+                {
+                    <div class="col-6 col-lg-4 book-card-wrapper">
+                        <div class="store-card h-100">
+                            <a class="a-cleanup" asp-controller="Store" asp-action="Details" asp-route-id="@book.Id">
+                                <div style="overflow:hidden;">
+                                    <img src="@book.ImageUrl" class="card-img-custom" alt="@book.Title" />
+                                </div>
+                                <div class="card-body" style="height:5.5em;">
+                                    <h5>@book.Title</h5>
+                                    <small class="text-muted">@book.Author</small>
+                                </div>
+                            </a>
+                            <div class="card-Fav">
+                                <span class="card-text">@book.Price.ToString("c")</span>
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-primary btn-sm store-btn add-to-cart-ajax"
+                                            data-id="@book.Id"
+                                            data-title="@book.Title"
+                                            title="Add to Cart">
+                                        <i class="fa-solid fa-cart-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm add-to-favorites-ajax"
+                                            data-id="@book.Id"
+                                            data-title="@book.Title"
+                                            title="Add to Favorites">
+                                        <i class="fa-solid fa-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function showToast(title, message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.style.background = type === 'success' ? '#2d7a4f' : type === 'warning' ? '#c8963e' : '#e74c3c';
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : type === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-exclamation'}"></i>
+                <div class="toast-content">
+                    <span class="toast-title">${title}</span>
+                    <span class="toast-message">${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function getCsrfToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+        }
+
+        // Add to Cart AJAX
+        document.querySelectorAll('.add-to-cart-ajax').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const bookId = this.getAttribute('data-id');
+                const bookTitle = this.getAttribute('data-title');
+                const originalHtml = this.innerHTML;
+
+                this.disabled = true;
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+                try {
+                    const response = await fetch(`/Store/AddToCartAjax/${bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': getCsrfToken()
+                        }
+                    });
+                    const data = await response.json();
+
+                    this.disabled = false;
+
+                    if (data.success) {
+                        this.innerHTML = '<i class="fa-solid fa-cart-plus"></i>';
+                        showToast('Added to Cart!', `${bookTitle} added to your cart`, 'success');
+                        updateCartBadge(data.cartCount);
+                    } else {
+                        this.innerHTML = originalHtml;
+                        if (data.message === 'Please login first') {
+                            showToast('Login Required', 'Please login to add to cart', 'warning');
+                            setTimeout(() => {
+                                window.location.href = '/Identity/Account/Login';
+                            }, 2000);
+                        } else {
+                            showToast('Error', data.message || 'Something went wrong', 'error');
+                        }
+                    }
+                } catch (error) {
+                    this.disabled = false;
+                    this.innerHTML = originalHtml;
+                    showToast('Error', 'Something went wrong', 'error');
+                }
+            });
+        });
+
+        // Add to Favorites AJAX
+        document.querySelectorAll('.add-to-favorites-ajax').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const bookId = this.getAttribute('data-id');
+                const bookTitle = this.getAttribute('data-title');
+                const originalHtml = this.innerHTML;
+
+                this.disabled = true;
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+                try {
+                    // ✅ استخدمي الرابط المطلق مع البورت الصحيح
+                    const response = await fetch(`https://localhost:7013/Favorites/AddToFavoritesAjax?bookId=${bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': getCsrfToken()
+                        }
+                    });
+
+                    console.log('Response status:', response.status);
+                    const data = await response.json();
+                    console.log('Response data:', data);
+
+                    this.disabled = false;
+
+                    if (data.success) {
+                        this.innerHTML = '<i class="fa-solid fa-heart" style="color:#e74c3c;"></i>';
+                        showToast('Added to Favorites!', data.message, 'success');
+                    } else {
+                        this.innerHTML = originalHtml;
+                        if (data.message === 'Please login first') {
+                            showToast('Login Required', 'Please login to add to favorites', 'warning');
+                            setTimeout(() => {
+                                window.location.href = '/Identity/Account/Login';
+                            }, 2000);
+                        } else if (data.message && data.message.includes('already')) {
+                            showToast('Already in Favorites', data.message, 'warning');
+                        } else {
+                            showToast('Error', data.message || 'Something went wrong', 'error');
+                        }
+                    }
+                } catch (error) {
+                    this.disabled = false;
+                    this.innerHTML = originalHtml;
+                    console.error('Fetch error:', error);
+                    showToast('Error', 'Something went wrong', 'error');
+                }
+            });
+        });
+        function updateCartBadge(count) {
+            const cartLink = document.querySelector('a[title="My Cart"]');
+            if (cartLink) {
+                let badge = cartLink.querySelector('.cart-badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'cart-badge';
+                    cartLink.appendChild(badge);
+                }
+                if (count > 0) {
+                    badge.innerText = count;
+                    badge.style.cssText = 'position:absolute; top:-8px; right:-12px; background:#e74c3c; color:white; border-radius:50%; padding:2px 6px; font-size:10px;';
+                    cartLink.style.position = 'relative';
+                } else {
+                    badge.remove();
+                }
+            }
+        }
+    </script>
+
+}
