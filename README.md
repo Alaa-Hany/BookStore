@@ -24,4 +24,4 @@
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Alaa-Hany/BookStore.git
-   cd Book.Store
+   cd BookStore
